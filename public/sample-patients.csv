@@ -1,0 +1,16 @@
+patient_id,name,age,sex,admission_date,discharge_date,admission_type,comorbidities,ed_visits_6mo,follow_up_due_date,follow_up_completed_date
+P001,John Miller,72,M,2026-09-05,2026-09-14,emergent,chf;copd;diabetes,2,,
+P002,Mary Johnson,65,F,2026-09-10,2026-09-11,elective,diabetes,0,,2026-09-15
+P003,Robert Lee,80,M,2026-08-20,2026-09-01,emergent,cva;dementia;renal disease;diabetes with complications,4,,
+P004,Susan Davis,45,F,2026-09-16,2026-09-17,urgent,,1,2026-09-25,
+P005,James Wilson,58,M,2026-09-01,2026-09-08,emergent,myocardial infarction;peripheral vascular disease,3,,
+P006,Patricia Garcia,70,F,2026-09-12,2026-09-13,elective,connective tissue disease,0,2026-09-20,
+P007,Michael Brown,55,M,2026-09-14,2026-09-18,urgent,copd;mild liver disease,2,,
+P008,Linda Martinez,67,F,2026-08-25,2026-09-02,emergent,metastatic solid tumor,1,,2026-09-10
+P009,William Anderson,39,M,2026-09-17,2026-09-18,elective,,0,,
+P010,Elizabeth Thomas,82,F,2026-09-03,2026-09-16,emergent,hemiplegia;renal disease;diabetes with complications,4,2026-09-18,
+P011,Charles Jackson,60,M,2026-09-15,2026-09-16,urgent,diabetes,1,,
+P012,Barbara White,74,F,2026-08-30,2026-09-05,emergent,chf;copd;cva,3,2026-09-12,
+P013,Joseph Harris,50,M,2026-09-13,2026-09-14,elective,,0,,2026-09-16
+P014,Jennifer Clark,63,F,2026-09-08,2026-09-12,urgent,diabetes;copd,2,,
+P015,Thomas Lewis,77,M,2026-09-09,2026-09-19,emergent,aids,4,2026-09-17,
