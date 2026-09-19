@@ -3,33 +3,31 @@ import { PatientDetail } from './components/PatientDetail'
 import { PatientTable } from './components/PatientTable'
 import { StatCards } from './components/StatCards'
 import { Uploader } from './components/Uploader'
-import { evaluatePatients } from './lib/patientResult'
-import type { FollowUpStatus, PatientRecord, RiskTier } from './lib/types'
+import type { FollowUpStatus, PatientResult, RiskTier } from './lib/types'
 
 export default function App() {
-  const [records, setRecords] = useState<PatientRecord[] | null>(null)
+  const [results, setResults] = useState<PatientResult[] | null>(null)
   const [sourceName, setSourceName] = useState('')
   const [search, setSearch] = useState('')
   const [riskFilter, setRiskFilter] = useState<RiskTier | null>(null)
   const [followUpFilter, setFollowUpFilter] = useState<FollowUpStatus | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const results = useMemo(() => (records ? evaluatePatients(records) : []), [records])
-
   const filtered = useMemo(() => {
+    if (!results) return []
     const query = search.trim().toLowerCase()
     return results.filter((r) => {
       if (riskFilter && r.riskTier !== riskFilter) return false
       if (followUpFilter && r.followUp.status !== followUpFilter) return false
-      if (query && !`${r.record.name} ${r.record.patientId}`.toLowerCase().includes(query)) return false
+      if (query && !`${r.patient.name} ${r.patient.patientId}`.toLowerCase().includes(query)) return false
       return true
     })
   }, [results, riskFilter, followUpFilter, search])
 
-  const selected = results.find((r) => r.record.patientId === selectedId) ?? null
+  const selected = results?.find((r) => r.patient.patientId === selectedId) ?? null
 
-  if (!records) {
-    return <Uploader onLoaded={(recs, name) => { setRecords(recs); setSourceName(name) }} />
+  if (!results) {
+    return <Uploader onLoaded={(res, name) => { setResults(res); setSourceName(name) }} />
   }
 
   return (
@@ -44,10 +42,10 @@ export default function App() {
           </div>
           <button
             type="button"
-            onClick={() => { setRecords(null); setSelectedId(null); setSearch(''); setRiskFilter(null); setFollowUpFilter(null) }}
+            onClick={() => { setResults(null); setSelectedId(null); setSearch(''); setRiskFilter(null); setFollowUpFilter(null) }}
             className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
-            Upload new CSV
+            Upload new workbook
           </button>
         </div>
       </header>
@@ -88,7 +86,6 @@ export default function App() {
             <option value="overdue">Overdue</option>
             <option value="due-soon">Due soon</option>
             <option value="scheduled">Scheduled</option>
-            <option value="completed">Completed</option>
           </select>
 
           {(riskFilter || followUpFilter || search) && (

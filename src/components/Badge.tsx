@@ -26,14 +26,12 @@ const FOLLOW_UP_STYLES: Record<FollowUpStatus, string> = {
   overdue: 'bg-red-100 text-red-800 ring-red-600/20',
   'due-soon': 'bg-amber-100 text-amber-800 ring-amber-600/20',
   scheduled: 'bg-slate-100 text-slate-700 ring-slate-500/20',
-  completed: 'bg-emerald-100 text-emerald-800 ring-emerald-600/20',
 }
 
 const FOLLOW_UP_LABELS: Record<FollowUpStatus, string> = {
   overdue: 'Overdue',
   'due-soon': 'Due soon',
   scheduled: 'Scheduled',
-  completed: 'Completed',
 }
 
 export function FollowUpBadge({ status }: { status: FollowUpStatus }) {
