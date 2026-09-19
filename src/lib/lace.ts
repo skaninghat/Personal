@@ -1,9 +1,8 @@
-import { charlsonScoreFromConditions } from './charlson'
-import type { LaceBreakdown, PatientRecord, RiskTier } from './types'
+import type { LaceBreakdown, RiskTier } from './types'
 
 /** L: points for length of stay, in days. */
-function lengthOfStayPoints(days: number | null): number {
-  if (days === null || Number.isNaN(days) || days < 0) return 0
+function lengthOfStayPoints(days: number): number {
+  if (Number.isNaN(days) || days < 0) return 0
   if (days < 1) return 0
   if (days === 1) return 1
   if (days === 2) return 2
@@ -13,9 +12,9 @@ function lengthOfStayPoints(days: number | null): number {
   return 7
 }
 
-/** A: points for acuity of admission. */
-function acuityPoints(admissionType: PatientRecord['admissionType']): number {
-  return admissionType === 'emergent' ? 3 : 0
+/** A: points for acuity — inpatient admissions and ED visits are treated as unplanned/emergent. */
+function acuityPoints(visitType: string): number {
+  return visitType === 'Inpatient' || visitType === 'Emergency' ? 3 : 0
 }
 
 /** C: points for comorbidity burden, from the Charlson Comorbidity Index. */
@@ -27,21 +26,25 @@ function comorbidityPoints(charlsonScore: number): number {
   return 5
 }
 
-/** E: points for ED visits in the 6 months prior to admission. */
-function edVisitPoints(visits: number | null): number {
-  if (visits === null || Number.isNaN(visits) || visits < 0) return 0
+/** E: points for ED visits in the 6 months prior to the index visit. */
+function edVisitPoints(visits: number): number {
+  if (Number.isNaN(visits) || visits < 0) return 0
   if (visits >= 4) return 4
   return Math.round(visits)
 }
 
-export function computeLace(record: PatientRecord): LaceBreakdown {
-  const charlsonScore =
-    record.charlsonScoreOverride ?? charlsonScoreFromConditions(record.comorbidities)
+export interface LaceInputs {
+  lengthOfStayDays: number
+  visitType: string
+  charlsonScore: number
+  priorEdVisits6mo: number
+}
 
-  const l = lengthOfStayPoints(record.lengthOfStayDays)
-  const a = acuityPoints(record.admissionType)
-  const c = comorbidityPoints(charlsonScore)
-  const e = edVisitPoints(record.edVisits6mo)
+export function computeLace(inputs: LaceInputs): LaceBreakdown {
+  const l = lengthOfStayPoints(inputs.lengthOfStayDays)
+  const a = acuityPoints(inputs.visitType)
+  const c = comorbidityPoints(inputs.charlsonScore)
+  const e = edVisitPoints(inputs.priorEdVisits6mo)
 
   return {
     lengthOfStayPoints: l,
@@ -49,7 +52,7 @@ export function computeLace(record: PatientRecord): LaceBreakdown {
     comorbidityPoints: c,
     edVisitPoints: e,
     total: l + a + c + e,
-    charlsonScore,
+    charlsonScore: inputs.charlsonScore,
   }
 }
 

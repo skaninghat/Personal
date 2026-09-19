@@ -5,7 +5,7 @@ import { FollowUpBadge, RiskBadge } from './Badge'
 type SortKey = 'name' | 'lace' | 'followup'
 
 const RISK_ORDER = { high: 0, medium: 1, low: 2 } as const
-const FOLLOW_UP_ORDER = { overdue: 0, 'due-soon': 1, scheduled: 2, completed: 3 } as const
+const FOLLOW_UP_ORDER = { overdue: 0, 'due-soon': 1, scheduled: 2 } as const
 
 interface PatientTableProps {
   results: PatientResult[]
@@ -31,7 +31,7 @@ export function PatientTable({ results, selectedId, onSelect }: PatientTableProp
     copy.sort((a, b) => {
       let cmp = 0
       if (sortKey === 'name') {
-        cmp = a.record.name.localeCompare(b.record.name)
+        cmp = a.patient.name.localeCompare(b.patient.name)
       } else if (sortKey === 'lace') {
         cmp = a.lace.total - b.lace.total || RISK_ORDER[a.riskTier] - RISK_ORDER[b.riskTier]
       } else {
@@ -67,6 +67,7 @@ export function PatientTable({ results, selectedId, onSelect }: PatientTableProp
               Patient{sortIndicator('name')}
             </th>
             <th className="px-4 py-3 text-left font-medium text-slate-600">Age / Sex</th>
+            <th className="px-4 py-3 text-left font-medium text-slate-600">HF profile</th>
             <th
               className="cursor-pointer select-none px-4 py-3 text-left font-medium text-slate-600"
               onClick={() => toggleSort('lace')}
@@ -86,18 +87,24 @@ export function PatientTable({ results, selectedId, onSelect }: PatientTableProp
         <tbody className="divide-y divide-slate-100">
           {sorted.map((r) => (
             <tr
-              key={r.record.patientId}
-              onClick={() => onSelect(r.record.patientId)}
+              key={r.patient.patientId}
+              onClick={() => onSelect(r.patient.patientId)}
               className={`cursor-pointer hover:bg-slate-50 ${
-                selectedId === r.record.patientId ? 'bg-blue-50' : ''
+                selectedId === r.patient.patientId ? 'bg-blue-50' : ''
               }`}
             >
               <td className="px-4 py-3">
-                <div className="font-medium text-slate-900">{r.record.name}</div>
-                <div className="text-xs text-slate-500">{r.record.patientId}</div>
+                <div className="font-medium text-slate-900">{r.patient.name}</div>
+                <div className="text-xs text-slate-500">{r.patient.patientId}</div>
               </td>
               <td className="px-4 py-3 text-slate-600">
-                {r.record.age ?? '—'} {r.record.sex ?? ''}
+                {r.patient.age ?? '—'} {r.patient.sex ?? ''}
+              </td>
+              <td className="px-4 py-3 text-slate-600">
+                {r.clinicalSnapshot.hfType ?? '—'}
+                {r.clinicalSnapshot.nyhaClass && (
+                  <span className="text-slate-400"> · NYHA {r.clinicalSnapshot.nyhaClass}</span>
+                )}
               </td>
               <td className="px-4 py-3 font-medium text-slate-900">{r.lace.total}</td>
               <td className="px-4 py-3">
@@ -106,11 +113,7 @@ export function PatientTable({ results, selectedId, onSelect }: PatientTableProp
               <td className="px-4 py-3">
                 <FollowUpBadge status={r.followUp.status} />
               </td>
-              <td className="px-4 py-3 text-slate-600">
-                {r.followUp.status === 'completed'
-                  ? `Done ${r.followUp.completedDate}`
-                  : (r.followUp.dueDate ?? '—')}
-              </td>
+              <td className="px-4 py-3 text-slate-600">{r.followUp.dueDate ?? '—'}</td>
             </tr>
           ))}
         </tbody>
